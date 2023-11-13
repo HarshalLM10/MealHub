@@ -20,7 +20,7 @@ class SplashScreen : AppCompatActivity() {
             //This block will be executed after ANIMATION_TIME milliseconds.
 
             //After ANIMATION_TIME we will start the MainActivity
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, Signup::class.java))
 
             //To remove this activity from back stack so that
             // this activity will not show when user closes MainActivity
