@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <!-- Ensure that the navGraph attribute points to your navigation graph -->
-    <androidx.fragment.app.FragmentContainerView
+    <fragment
         android:id="@+id/M_fragments"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
@@ -29,7 +29,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="parent"
-        app:menu="@menu/btm_mnu" />
+        app:menu="@menu/btm_mnu"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
