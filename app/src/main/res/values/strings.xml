@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MealHub</string>
+    <!-- Define the missing string resource -->
+    <string name="hello_blank_fragment">Hello Blank Fragment!</string>
+
+
 </resources>
