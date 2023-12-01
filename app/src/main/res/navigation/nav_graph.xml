@@ -13,7 +13,7 @@
         tools:layout="@layout/fragment_home_" />
     <fragment
         android:id="@+id/categories_Fragment"
-        android:name="com.example.mealhub.categories_Fragment"
+        android:name="com.example.mealhub.fragments.categories_Fragment"
         android:label="fragment_categories_"
         tools:layout="@layout/fragment_categories_" />
     <fragment

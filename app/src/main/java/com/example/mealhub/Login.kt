@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.example.mealhub.activity.MainActivity
 import com.example.mealhub.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -24,7 +25,7 @@ class Login : AppCompatActivity() {
             if (email.isNotEmpty() && password.isNotEmpty()){
                 firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
                     if (it.isSuccessful){
-                        val intent = Intent(this,MainActivity::class.java)
+                        val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
                     }else{
                         Toast.makeText(this,it.exception.toString(),Toast.LENGTH_SHORT).show()

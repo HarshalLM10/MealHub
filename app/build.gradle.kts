@@ -37,9 +37,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    buildFeatures{
+        viewBinding = true
+    }
 }
 dependencies {
 
+    implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
     val nav_version = "2.7.5"
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -62,6 +66,12 @@ dependencies {
     implementation ("com.intuit.ssp:ssp-android:1.1.0")
 
     implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.28")
+    //retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //glide
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
 
 
 }
