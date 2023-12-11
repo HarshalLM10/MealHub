@@ -1,43 +1,45 @@
 package com.example.mealhub
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.example.mealhub.databinding.ActivityLoginBinding
+import com.example.mealhub.activity.MealActivity
+import com.example.mealhub.adapters.CategoriesAdapter
+import com.example.mealhub.adapters.MostPopularMealAdapter
 import com.example.mealhub.databinding.FragmentHomeBinding
 import com.example.mealhub.pojo.Meal
-import com.example.mealhub.pojo.MealList
-import com.example.mealhub.retrofit.RetrofitInstance
-import retrofit2.Call
-import retrofit2.Response
-import javax.security.auth.callback.Callback
-import kotlin.math.log
+import com.example.mealhub.pojo.MealsByCategory
+import com.example.mealhub.viewModel.HomeViewModel
 
-//// TODO: Rename parameter arguments, choose names that match
-//// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//private const val ARG_PARAM1 = "param1"
-//private const val ARG_PARAM2 = "param2"
-//
-///**
-// * A simple [Fragment] subclass.
-// * Use the [home_Fragment.newInstance] factory method to
-// * create an instance of this fragment.
-// */
+
 class home_Fragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-//    // TODO: Rename and change types of parameters
-//    private var param1: String? = null
-//    private var param2: String? = null
+    private lateinit var homeMvvm:HomeViewModel
+    private lateinit var randomMeal: Meal
+    private lateinit var popularItemAdapter: MostPopularMealAdapter
+    private lateinit var categoriesAdapter: CategoriesAdapter
+
+    companion object{
+        const val MEAL_ID = "com.example.mealhub.idMeal"
+        const val MEAL_NAME = "com.example.mealhub.nameMeal"
+        const val MEAL_THUMB = "com.example.mealhub.thumbMeal"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
+
+        homeMvvm = ViewModelProviders.of(this)[HomeViewModel::class.java]
+
+        popularItemAdapter = MostPopularMealAdapter()
+
         }
 
 
@@ -53,46 +55,90 @@ class home_Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        RetrofitInstance.api.getRandomMeal().enqueue(object : retrofit2.Callback<MealList>{
-            override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
-                if(response.body()!=null){
-                    val randomMeal: Meal = response.body()!!.meals[0]
-                    Glide.with(this@home_Fragment)
-                        .load(randomMeal.strMealThumb)
-                        .into(binding.randomMeal)
+        preparePopularItemRecyclerView()
+        homeMvvm.getRandomMeal()
+        observerRandomMeal()
+        onRandomMealClick()
 
-                }else{
-                    return
-                }
-            }
+        homeMvvm.getPopulatItems()
+        observePopularItemLiveData()
 
-            override fun onFailure(call: Call<MealList>, t: Throwable) {
-                Log.d("home_Fragment",t.message.toString())
-            }
-        } )
+        onPopularItemClick()
+
+        prepareCategoriesRecyclerview()
+
+        homeMvvm.getCategories()
+        observeCategoriesLiveData()
 
 
+        }
 
+    private fun prepareCategoriesRecyclerview() {
+        categoriesAdapter = CategoriesAdapter()
+        binding.recViewCategories.apply {
+            layoutManager = GridLayoutManager(context,3,GridLayoutManager.VERTICAL,false)
+            adapter = categoriesAdapter
+    }
+
+
+}
+
+    private fun observeCategoriesLiveData() {
+        homeMvvm.observeCategoriesLiveData().observe(viewLifecycleOwner, Observer { categories->
+
+            categoriesAdapter.setCategoryList(categories)
+
+
+        }
+        )
+    }
+
+    private fun onPopularItemClick() {
+        popularItemAdapter.onItemClick = { meal->
+            val intent = Intent(activity,MealActivity::class.java)
+            intent.putExtra(MEAL_ID,meal.idMeal)
+            intent.putExtra(MEAL_NAME,meal.strMeal)
+            intent.putExtra(MEAL_THUMB,meal.strMealThumb)
+            startActivity(intent)
+        }
+    }
+
+    private fun preparePopularItemRecyclerView() {
+        binding.recViewMealsPopular.apply {
+            layoutManager = LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false)
+            adapter = popularItemAdapter
+
+        }
+    }
+
+    private fun observePopularItemLiveData() {
+        homeMvvm.observePopularItemLiveData().observe(viewLifecycleOwner
+        ) { mealList->
+            popularItemAdapter.setMeals(mealsList = mealList as ArrayList<MealsByCategory>)
+        }
+    }
+
+    private fun onRandomMealClick() {
+        binding.randomMealCard.setOnClickListener {
+            val intent = Intent(activity,MealActivity::class.java)
+            intent.putExtra(MEAL_ID,randomMeal.idMeal)
+            intent.putExtra(MEAL_NAME,randomMeal.strMeal)
+            intent.putExtra(MEAL_THUMB,randomMeal.strMealThumb)
+            startActivity(intent)
+        }
+    }
+
+    private fun observerRandomMeal() {
+        homeMvvm.observeRandomMealLiveData().observe(viewLifecycleOwner,
+            { meal ->
+                Glide.with(this@home_Fragment)
+                    .load(meal!!.strMealThumb)
+                    .into(binding.randomMeal)
+
+                this.randomMeal = meal
+
+
+            })
     }
 }
 
-//    companion object {
-//        /**
-//         * Use this factory method to create a new instance of
-//         * this fragment using the provided parameters.
-//         *
-//         * @param param1 Parameter 1.
-//         * @param param2 Parameter 2.
-//         * @return A new instance of fragment home_Fragment.
-//         */
-        // TODO: Rename and change types and number of parameters
-//        @JvmStatic
-//        fun newInstance(param1: String, param2: String) =
-//            home_Fragment().apply {
-//                arguments = Bundle().apply {
-//                    putString(ARG_PARAM1, param1)
-//                    putString(ARG_PARAM2, param2)
-//                }
-//            }
-//    }
-//}
